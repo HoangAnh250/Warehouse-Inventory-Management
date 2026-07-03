@@ -2,11 +2,24 @@ package warehouse.model;
 
 public class Batchdeque {
 
-    private ProductBatch[] data;
+    private class Node {
+
+        ProductBatch data;
+        Node next;
+        Node prev;
+
+        Node(ProductBatch data) {
+            this.data = data;
+        }
+    }
+
+    private Node head;
+    private Node tail;
     private int size;
 
     public Batchdeque() {
-        data = new ProductBatch[10];
+        head = null;
+        tail = null;
         size = 0;
     }
 
@@ -20,9 +33,21 @@ public class Batchdeque {
 
     public void addLast(ProductBatch batch) {
 
-        ensureCapacity();
+        Node newNode = new Node(batch);
 
-        data[size] = batch;
+        if (isEmpty()) {
+
+            head = newNode;
+            tail = newNode;
+
+        } else {
+
+            tail.next = newNode;
+            newNode.prev = tail;
+
+            tail = newNode;
+        }
+
         size++;
     }
 
@@ -32,7 +57,7 @@ public class Batchdeque {
             return null;
         }
 
-        return data[0];
+        return head.data;
     }
 
     public ProductBatch peekLast() {
@@ -41,7 +66,7 @@ public class Batchdeque {
             return null;
         }
 
-        return data[size - 1];
+        return tail.data;
     }
 
     public ProductBatch removeFirst() {
@@ -50,16 +75,18 @@ public class Batchdeque {
             return null;
         }
 
-        ProductBatch removed = data[0];
+        ProductBatch removed = head.data;
 
-        for (int i = 0;
-                i < size - 1;
-                i++) {
+        if (size == 1) {
 
-            data[i] = data[i + 1];
+            head = null;
+            tail = null;
+
+        } else {
+
+            head = head.next;
+            head.prev = null;
         }
-
-        data[size - 1] = null;
 
         size--;
 
@@ -72,28 +99,22 @@ public class Batchdeque {
             return null;
         }
 
-        ProductBatch removed
-                = data[size - 1];
+        ProductBatch removed = tail.data;
 
-        data[size - 1] = null;
+        if (size == 1) {
+
+            head = null;
+            tail = null;
+
+        } else {
+
+            tail = tail.prev;
+            tail.next = null;
+        }
 
         size--;
 
         return removed;
     }
 
-    private void ensureCapacity() {
-
-        if (size < data.length) {
-            return;
-        }
-
-        ProductBatch[] newData= new ProductBatch[data.length * 2];
-
-        for (int i = 0; i < size; i++) {
-            newData[i] = data[i];
-        }
-
-        data = newData;
-    }
 }

@@ -15,6 +15,8 @@ public class ProductBST {
     }
 
     private Node root;
+    private int traversalIndex;
+
 
     public ProductBST() {
         this.root = null;
@@ -37,18 +39,18 @@ public class ProductBST {
         Node parent = null;
         while (current != null) {
             parent = current;
-            int comparision = product.getBarcode().compareToIgnoreCase(current.product.getBarcode());
-            if (comparision == 0) {
+            int cmpResult = product.getBarcode().compareToIgnoreCase(current.product.getBarcode());
+            if (cmpResult == 0) {
                 return false;
-            } else if (comparision < 0) {
+            } else if (cmpResult < 0) {
                 current = current.left;
             } else {
                 current = current.right;
             }
 
         }
-        int comparision = product.getBarcode().compareToIgnoreCase(parent.product.getBarcode());
-        if (comparision < 0) {
+        int cmp  = product.getBarcode().compareToIgnoreCase(parent.product.getBarcode());
+        if (cmp < 0) {
             parent.left = newNode;
         } else {
             parent.right = newNode;
@@ -61,16 +63,45 @@ public class ProductBST {
         }
         Node current = root;
         while(current != null){
-            int comparision =  barcode.compareToIgnoreCase(current.product.getBarcode());
-            if(comparision == 0){
+            int cmp =  barcode.compareToIgnoreCase(current.product.getBarcode());
+            if(cmp == 0){
                 return current.product;
-            } else if(comparision < 0){
+            } else if(cmp < 0){
                 current = current.left;
             } else {
                 current = current.right;
             }
         }
         return null;
+    }
+    private int countNodes(Node node){
+        if(node == null){
+            return 0;
+        }
+        return 1 + countNodes(node.left) + countNodes(node.right);
+    }
+    public int totalNodes(){
+        return countNodes(root);
+    }
+    
+    private void inOrder(Node node, Product[] products){
+        if(node == null){
+            return;
+        }
+        //traverse left
+        inOrder(node.left, products);
+        //visit root
+        products[traversalIndex] = node.product;
+        traversalIndex++;
+        //traverse right
+        inOrder(node.right, products);
+    }
+    public Product[] getProductsInOrder(){
+        int numberOfProducts = countNodes(root);
+        Product[] products = new Product[numberOfProducts];
+        traversalIndex = 0;
+        inOrder(root, products);
+        return products;
     }
 
 }
